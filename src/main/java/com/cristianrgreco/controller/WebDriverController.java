@@ -2,8 +2,6 @@ package com.cristianrgreco.controller;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchElementException;
@@ -15,17 +13,20 @@ import com.cristianrgreco.model.builder.ProductBuilder;
 import com.cristianrgreco.model.entity.PerformanceData;
 import com.cristianrgreco.model.entity.Product;
 import com.cristianrgreco.util.NumberFormatter;
+import com.cristianrgreco.util.PerformanceParser;
 
 public class WebDriverController {
-    private static final Pattern PERFORMANCE_STRING = Pattern.compile("(.*?)cookie.*?: (.*)", Pattern.DOTALL);
     private static final Logger LOGGER = Logger.getLogger(WebDriverController.class);
 
     private WebDriverAdapter webDriverAdapter;
     private NumberFormatter numberFormatter;
+    private PerformanceParser performanceParser;
 
-    public WebDriverController(WebDriverAdapter webDriverAdapter, NumberFormatter numberFormatter) {
+    public WebDriverController(WebDriverAdapter webDriverAdapter, NumberFormatter numberFormatter,
+            PerformanceParser performanceParser) {
         this.webDriverAdapter = webDriverAdapter;
         this.numberFormatter = numberFormatter;
+        this.performanceParser = performanceParser;
     }
 
     public void connectToTargetUrl() {
@@ -88,38 +89,9 @@ public class WebDriverController {
     }
 
     public PerformanceData getPerformanceData() {
+        LOGGER.debug("Getting performance data");
         String performanceString = this.webDriverAdapter.getPerformanceString();
-        Matcher matcher = PERFORMANCE_STRING.matcher(performanceString);
-        matcher.find();
-        String numberOfCookiesString = matcher.group(1);
-        double numberOfCookies = this.parseNumberOfCookies(numberOfCookiesString);
-        String cookiesPerSecondString = matcher.group(2);
-        double cookiesPerSecond = this.parseCookiesPerSecond(cookiesPerSecondString);
-        PerformanceData performanceData = new PerformanceData(numberOfCookies, cookiesPerSecond);
-        LOGGER.debug("Got the following performance data: " + performanceData);
+        PerformanceData performanceData = this.performanceParser.parsePerformanceData(performanceString);
         return performanceData;
-    }
-
-    private double parseNumberOfCookies(String numberOfCookiesString) {
-        double numberOfCookies = -1;
-        try {
-            numberOfCookies = this.numberFormatter.parseDoubleWithAppendedText(numberOfCookiesString);
-        } catch (ParseException e) {
-            LOGGER.error(null, e);
-        }
-        return numberOfCookies;
-    }
-
-    private double parseCookiesPerSecond(String cookiesPerSecondString) {
-        double cookiesPerSecond = -1;
-        try {
-            cookiesPerSecond = this.numberFormatter.parseDoubleWithAppendedText(cookiesPerSecondString);
-            if (cookiesPerSecond == 0.0) {
-                cookiesPerSecond = 0.1;
-            }
-        } catch (ParseException e) {
-            LOGGER.error(null, e);
-        }
-        return cookiesPerSecond;
     }
 }
