@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.cristianrgreco.model.entity.PerformanceData;
-
 @RunWith(MockitoJUnitRunner.class)
 public class PerformanceDataTest {
     @Test
@@ -17,6 +15,7 @@ public class PerformanceDataTest {
         PerformanceData data2 = new PerformanceData(1.0, 5.5);
 
         assertEquals(data1, data2);
+        assertEquals(data1.hashCode(), data2.hashCode());
     }
 
     @Test
@@ -25,5 +24,6 @@ public class PerformanceDataTest {
         PerformanceData data2 = new PerformanceData(1.1, 5.5);
 
         assertNotEquals(data1, data2);
+        assertNotEquals(data1.hashCode(), data2.hashCode());
     }
 }
