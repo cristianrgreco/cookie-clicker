@@ -12,10 +12,10 @@ public class PerformanceParser {
     private static final Pattern PERFORMANCE_STRING = Pattern.compile("(.*?)cookie.*?: (.*)", Pattern.DOTALL);
     private static final Logger LOGGER = Logger.getLogger(PerformanceParser.class);
 
-    private NumberFormatter numberFormatter;
+    private NumberParser numberParser;
 
-    public PerformanceParser(NumberFormatter numberFormatter) {
-        this.numberFormatter = numberFormatter;
+    public PerformanceParser(NumberParser numberParser) {
+        this.numberParser = numberParser;
     }
 
     public PerformanceData parsePerformanceData(String performanceDataString) {
@@ -33,7 +33,7 @@ public class PerformanceParser {
     private double parseNumberOfCookies(String numberOfCookiesString) {
         double numberOfCookies = -1;
         try {
-            numberOfCookies = this.numberFormatter.parseDoubleWithAppendedText(numberOfCookiesString);
+            numberOfCookies = this.numberParser.parseDoubleWithAppendedText(numberOfCookiesString);
         } catch (ParseException e) {
             LOGGER.error(null, e);
         }
@@ -43,7 +43,7 @@ public class PerformanceParser {
     private double parseCookiesPerSecond(String cookiesPerSecondString) {
         double cookiesPerSecond = -1;
         try {
-            cookiesPerSecond = this.numberFormatter.parseDoubleWithAppendedText(cookiesPerSecondString);
+            cookiesPerSecond = this.numberParser.parseDoubleWithAppendedText(cookiesPerSecondString);
             if (cookiesPerSecond == 0.0) {
                 cookiesPerSecond = 0.1;
             }

@@ -7,15 +7,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.cristianrgreco.util.NumberFormatter;
-
 @RunWith(MockitoJUnitRunner.class)
-public class NumberFormatterTest {
-    private NumberFormatter target;
+public class NumberParserTest {
+    private NumberParser target;
 
     @Before
     public void setup() {
-        this.target = new NumberFormatter();
+        this.target = new NumberParser();
     }
 
     @Test

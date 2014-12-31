@@ -5,7 +5,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-public class NumberFormatter {
+public class NumberParser {
     private static final NumberFormat NUMBER_FORMATTER = DecimalFormat.getInstance(Locale.US);
 
     public double parseDoubleWithAppendedText(String numberString) throws ParseException {

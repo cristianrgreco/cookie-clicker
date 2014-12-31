@@ -12,20 +12,20 @@ import com.cristianrgreco.adapter.WebDriverAdapter;
 import com.cristianrgreco.model.builder.ProductBuilder;
 import com.cristianrgreco.model.entity.PerformanceData;
 import com.cristianrgreco.model.entity.Product;
-import com.cristianrgreco.util.NumberFormatter;
+import com.cristianrgreco.util.NumberParser;
 import com.cristianrgreco.util.PerformanceParser;
 
 public class WebDriverController {
     private static final Logger LOGGER = Logger.getLogger(WebDriverController.class);
 
     private WebDriverAdapter webDriverAdapter;
-    private NumberFormatter numberFormatter;
+    private NumberParser numberParser;
     private PerformanceParser performanceParser;
 
-    public WebDriverController(WebDriverAdapter webDriverAdapter, NumberFormatter numberFormatter,
+    public WebDriverController(WebDriverAdapter webDriverAdapter, NumberParser numberParser,
             PerformanceParser performanceParser) {
         this.webDriverAdapter = webDriverAdapter;
-        this.numberFormatter = numberFormatter;
+        this.numberParser = numberParser;
         this.performanceParser = performanceParser;
     }
 
@@ -56,10 +56,10 @@ public class WebDriverController {
         try {
             productName = this.webDriverAdapter.getNameOfUnlockedProduct(productId, product);
             String productPriceString = this.webDriverAdapter.getPriceOfUnlockedProduct(productId, product);
-            productPrice = this.numberFormatter.parseDoubleWithAppendedText(productPriceString);
+            productPrice = this.numberParser.parseDoubleWithAppendedText(productPriceString);
             String productCookiesPerSecondString = this.webDriverAdapter.getCookiesPerSecondOfUnlockedProduct(
                     productId, product);
-            double productCookiesPerSecond = this.numberFormatter
+            double productCookiesPerSecond = this.numberParser
                     .parseDoubleWithAppendedText(productCookiesPerSecondString);
             productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
                     .setCookiesPerSecond(productCookiesPerSecond).build();

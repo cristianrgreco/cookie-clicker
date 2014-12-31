@@ -7,7 +7,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.cristianrgreco.adapter.WebDriverAdapter;
 import com.cristianrgreco.controller.WebDriverController;
-import com.cristianrgreco.util.NumberFormatter;
+import com.cristianrgreco.util.NumberParser;
 import com.cristianrgreco.util.PerformanceParser;
 
 public class WebDriverFactory {
@@ -35,9 +35,9 @@ public class WebDriverFactory {
 
     private static WebDriverController createControllerFromDriver(WebDriver webDriver, String targetUrl) {
         WebDriverAdapter webDriverAdapter = new WebDriverAdapter(webDriver, targetUrl);
-        NumberFormatter numberFormatter = new NumberFormatter();
-        PerformanceParser performanceParser = new PerformanceParser(numberFormatter);
-        WebDriverController webDriverController = new WebDriverController(webDriverAdapter, numberFormatter,
+        NumberParser numberParser = new NumberParser();
+        PerformanceParser performanceParser = new PerformanceParser(numberParser);
+        WebDriverController webDriverController = new WebDriverController(webDriverAdapter, numberParser,
                 performanceParser);
         return webDriverController;
     }

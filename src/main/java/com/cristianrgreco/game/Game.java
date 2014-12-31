@@ -43,7 +43,7 @@ public class Game implements Runnable {
                 while (true) {
                     LOCK.lock();
                     try {
-                        controller.clickOnBigCookie();
+                        Game.this.controller.clickOnBigCookie();
                     } finally {
                         LOCK.unlock();
                     }

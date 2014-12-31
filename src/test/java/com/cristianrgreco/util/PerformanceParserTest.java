@@ -15,11 +15,11 @@ public class PerformanceParserTest {
     private PerformanceParser target;
 
     @Spy
-    private NumberFormatter numberFormatter;
+    private NumberParser numberParser;
 
     @Before
     public void setup() {
-        this.target = new PerformanceParser(this.numberFormatter);
+        this.target = new PerformanceParser(this.numberParser);
     }
 
     @Test
