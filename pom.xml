@@ -55,7 +55,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.cristianrgreco.Main</mainClass>
+							<mainClass>com.cristianrgreco.main.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
