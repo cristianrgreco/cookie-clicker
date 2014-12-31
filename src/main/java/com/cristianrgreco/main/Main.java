@@ -1,7 +1,6 @@
 package com.cristianrgreco.main;
 
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
 
@@ -12,18 +11,14 @@ public class Main {
     private static final String TARGET_URL = "http://orteil.dashnet.org/cookieclicker/";
     private static final Logger LOGGER = Logger.getLogger(Main.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        LOGGER.info("Starting cookie clicker");
         setLookAndFeelToMatchSystem();
         initialiseAndStartGame();
     }
 
-    private static void setLookAndFeelToMatchSystem() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                | UnsupportedLookAndFeelException e) {
-            LOGGER.error(null, e);
-        }
+    private static void setLookAndFeelToMatchSystem() throws Exception {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
 
     private static void initialiseAndStartGame() {

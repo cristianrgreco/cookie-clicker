@@ -16,6 +16,7 @@ import com.cristianrgreco.model.entity.Product;
 
 public class Game implements Runnable {
     private static final Lock LOCK = new ReentrantLock(true);
+    private static final double BASE_PRODUCT_EFFICIENCY = Double.MAX_VALUE * -1;
     private static final Logger LOGGER = Logger.getLogger(Game.class);
 
     private WebDriverController controller;
@@ -76,7 +77,7 @@ public class Game implements Runnable {
             double cookiesPerSecond = performanceData.getCookiesPerSecond();
 
             if (idOfMostCostEffectiveProduct == -1) {
-                double bestProductEfficiency = Double.MAX_VALUE * -1;
+                double bestProductEfficiency = BASE_PRODUCT_EFFICIENCY;
                 for (Map.Entry<Integer, Product> entrySet : this.products.entrySet()) {
                     Integer productId = entrySet.getKey();
                     Product product = entrySet.getValue();
@@ -98,7 +99,7 @@ public class Game implements Runnable {
                 String productName = productToBuy.getName();
                 double productPrice = productToBuy.getPrice();
 
-                int percentageComplete = (int) (((float) numberOfCookies) / ((float) productPrice) * 100);
+                int percentageComplete = this.calculatePercentageComplete(numberOfCookies, productPrice);
                 this.informationFrameController.setProductLabel(productName);
                 this.informationFrameController.setProductProgressBar(percentageComplete);
 
@@ -115,6 +116,12 @@ public class Game implements Runnable {
                 }
             }
         }
+    }
+
+    private int calculatePercentageComplete(double current, double total) {
+        double percentageComplete = (current / total) * 100;
+        int percentageCompleteInteger = (int) percentageComplete;
+        return percentageCompleteInteger;
     }
 
     private void addNewProductToCache(int productId, WebElement product) {
