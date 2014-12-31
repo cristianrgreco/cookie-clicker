@@ -66,7 +66,7 @@ public class InformationFrame {
         this.productTable.setModel(this.productTableModel);
         Dimension productTableDimension = this.productTable.getPreferredSize();
         this.productTableScrollPane.setPreferredSize(new Dimension(productTableDimension.width, this.productTable
-                .getRowHeight() * (PRODUCT_TABLE_ROW_COUNT + 2)));
+                .getRowHeight() * (PRODUCT_TABLE_ROW_COUNT + 3)));
     }
 
     private void addAndPackComponents() {
