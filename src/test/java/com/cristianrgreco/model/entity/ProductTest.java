@@ -19,6 +19,7 @@ public class ProductTest {
                 .setEfficiency(-5).build();
 
         assertEquals(product1, product2);
+        assertEquals(product1.hashCode(), product2.hashCode());
     }
 
     @Test
@@ -29,5 +30,6 @@ public class ProductTest {
                 .setEfficiency(-5).build();
 
         assertNotEquals(product1, product2);
+        assertNotEquals(product1.hashCode(), product2.hashCode());
     }
 }
