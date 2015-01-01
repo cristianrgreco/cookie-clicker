@@ -1,4 +1,4 @@
-package com.cristianrgreco.ui;
+package com.cristianrgreco.controller;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,6 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.cristianrgreco.controller.InformationFrameController;
 import com.cristianrgreco.model.builder.ProductBuilder;
 import com.cristianrgreco.model.entity.Product;
+import com.cristianrgreco.ui.InformationFrame;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InformationFrameControllerTest {
