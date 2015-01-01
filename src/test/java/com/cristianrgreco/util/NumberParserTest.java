@@ -2,6 +2,9 @@ package com.cristianrgreco.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,6 +77,41 @@ public class NumberParserTest {
         double actual = this.target.parseDoubleWithAppendedText(number);
 
         assertEquals(expected, actual, 0);
+    }
+
+    @Test
+    public void testAllTextUnits() throws Exception {
+        List<Double> expected = new ArrayList<Double>();
+        expected.add(1000000.0);
+        expected.add(1000000000.0);
+        expected.add(1000000000000.0);
+        expected.add(1000000000000000.0);
+        expected.add(1000000000000000000.0);
+        expected.add(1000000000000000000000.0);
+        expected.add(1000000000000000000000000.0);
+        expected.add(1000000000000000000000000000.0);
+        expected.add(1000000000000000000000000000000.0);
+        expected.add(1000000000000000000000000000000000.0);
+
+        List<String> numberStrings = new ArrayList<String>();
+        numberStrings.add("1 million");
+        numberStrings.add("1 billion");
+        numberStrings.add("1 trillion");
+        numberStrings.add("1 quadrillion");
+        numberStrings.add("1 quintillion");
+        numberStrings.add("1 sextillion");
+        numberStrings.add("1 septillion");
+        numberStrings.add("1 octillion");
+        numberStrings.add("1 nonillion");
+        numberStrings.add("1 decillion");
+
+        List<Double> actual = new ArrayList<Double>();
+        for (String numberString : numberStrings) {
+            double result = this.target.parseDoubleWithAppendedText(numberString);
+            actual.add(result);
+        }
+
+        assertEquals(expected, actual);
     }
 
     @Test(expected = NumberFormatException.class)
