@@ -81,7 +81,7 @@ public class NumberParserTest {
 
     @Test
     public void testAllTextUnits() throws Exception {
-        List<Double> expected = new ArrayList<Double>();
+        List<Double> expected = new ArrayList<>();
         expected.add(1000000.0);
         expected.add(1000000000.0);
         expected.add(1000000000000.0);
@@ -93,7 +93,7 @@ public class NumberParserTest {
         expected.add(1000000000000000000000000000000.0);
         expected.add(1000000000000000000000000000000000.0);
 
-        List<String> numberStrings = new ArrayList<String>();
+        List<String> numberStrings = new ArrayList<>();
         numberStrings.add("1 million");
         numberStrings.add("1 billion");
         numberStrings.add("1 trillion");
@@ -105,7 +105,7 @@ public class NumberParserTest {
         numberStrings.add("1 nonillion");
         numberStrings.add("1 decillion");
 
-        List<Double> actual = new ArrayList<Double>();
+        List<Double> actual = new ArrayList<>();
         for (String numberString : numberStrings) {
             double result = this.target.parseDoubleWithAppendedText(numberString);
             actual.add(result);
