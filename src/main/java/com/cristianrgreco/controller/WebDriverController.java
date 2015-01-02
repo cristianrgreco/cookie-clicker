@@ -63,8 +63,8 @@ public class WebDriverController {
                     .parseDoubleWithAppendedText(productCookiesPerSecondString);
             productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
                     .setCookiesPerSecond(productCookiesPerSecond).build();
-        } catch (NoSuchElementException | NumberFormatException | ParseException e) {
-            LOGGER.debug("No product cookies per second found, estimating product specification");
+        } catch (NoSuchElementException e) {
+            LOGGER.debug("New product found, estimating product specification");
             double estimatedCookiesPerSecond = this.estimateProductCookiesPerSecondFromPrice(productPrice);
             productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
                     .setCookiesPerSecond(estimatedCookiesPerSecond).build();
@@ -72,6 +72,9 @@ public class WebDriverController {
             LOGGER.debug("Encountered a StaleElementException, retrying");
             productObject = this.convertProductWebElementToProductObject(productId, product);
             return productObject;
+        } catch (NumberFormatException | ParseException e) {
+            LOGGER.error("Error occurred while getting information for a product", e);
+            System.exit(1);
         }
         LOGGER.info("Created the following product object for ID of " + productId + ": " + productObject);
         return productObject;

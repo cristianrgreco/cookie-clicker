@@ -97,8 +97,7 @@ public class WebDriverControllerTest {
     }
 
     @Test
-    public void testConvertProductWebElementToProductObjectEstimatesSpecIfNonRecoverableErrorRaised()
-            throws Exception {
+    public void testConvertProductWebElementToProductObjectEstimatesSpecIfNoProductInfoExists() throws Exception {
         double estimatedCookiesPerSecond = 0.025;
         Product expected = new ProductBuilder().setName("Product").setPrice(5.0)
                 .setCookiesPerSecond(estimatedCookiesPerSecond).build();
