@@ -23,8 +23,18 @@ public class PerformanceParserTest {
     }
 
     @Test
-    public void testParseStartingPerformanceData() throws Exception {
+    public void testCookiesPerSecondIsNeverZero() throws Exception {
         String data = "0 cookies\nper second : 0.0";
+
+        PerformanceData expected = new PerformanceData(0.0, 0.1);
+        PerformanceData actual = this.target.parsePerformanceData(data);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testParseStartingPerformanceData() throws Exception {
+        String data = "0 cookies\nper second : 0.1";
 
         PerformanceData expected = new PerformanceData(0.0, 0.1);
         PerformanceData actual = this.target.parsePerformanceData(data);

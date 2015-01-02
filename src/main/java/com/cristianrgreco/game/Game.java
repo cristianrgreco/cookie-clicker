@@ -3,6 +3,8 @@ package com.cristianrgreco.game;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,8 +16,9 @@ import com.cristianrgreco.controller.WebDriverController;
 import com.cristianrgreco.model.entity.PerformanceData;
 import com.cristianrgreco.model.entity.Product;
 
-public class Game implements Runnable {
+public class Game {
     private static final Lock LOCK = new ReentrantLock(true);
+    private static final int NUMBER_OF_CPUS = Runtime.getRuntime().availableProcessors();
     private static final double BASE_PRODUCT_EFFICIENCY = Double.MAX_VALUE * -1;
     private static final Logger LOGGER = Logger.getLogger(Game.class);
 
@@ -29,120 +32,121 @@ public class Game implements Runnable {
         this.informationFrameController = informationFrameController;
     }
 
-    @Override
-    public void run() {
+    public void startGame() {
         this.controller.connectToTargetUrl();
-        this.startBigCookieClickThread();
-        this.startProductPurchaserThread();
+        Executor executor = Executors.newFixedThreadPool(NUMBER_OF_CPUS);
+        executor.execute(new BigCookieClick());
+        executor.execute(new ProductPurchaser());
     }
 
-    private void startBigCookieClickThread() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    LOCK.lock();
-                    try {
-                        Game.this.controller.clickOnBigCookie();
-                    } finally {
-                        LOCK.unlock();
-                    }
-                }
-            }
-        }).start();
-    }
-
-    private void startProductPurchaserThread() {
-        int currentNumberOfUnlockedProducts = 0;
-        int idOfMostCostEffectiveProduct = -1;
-
-        while (true) {
-            List<WebElement> unlockedProducts = this.controller.getListOfUnlockedProducts();
-            int numberOfUnlockedProducts = unlockedProducts.size();
-            if (numberOfUnlockedProducts > currentNumberOfUnlockedProducts) {
-                currentNumberOfUnlockedProducts = numberOfUnlockedProducts;
-                int productId = numberOfUnlockedProducts - 1;
-                WebElement newProduct = unlockedProducts.get(productId);
+    private class BigCookieClick implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
                 LOCK.lock();
                 try {
-                    this.addNewProductToCache(productId, newProduct);
+                    Game.this.controller.clickOnBigCookie();
                 } finally {
                     LOCK.unlock();
-                }
-                idOfMostCostEffectiveProduct = -1;
-            }
-
-            PerformanceData performanceData = this.controller.getPerformanceData();
-            double numberOfCookies = performanceData.getNumberOfCookies();
-            double cookiesPerSecond = performanceData.getCookiesPerSecond();
-
-            if (idOfMostCostEffectiveProduct == -1) {
-                double bestProductEfficiency = BASE_PRODUCT_EFFICIENCY;
-                for (Map.Entry<Integer, Product> entrySet : this.products.entrySet()) {
-                    Integer productId = entrySet.getKey();
-                    Product product = entrySet.getValue();
-                    String productName = product.getName();
-                    double productEfficiency = this.calculateEfficiencyOfProduct(product, cookiesPerSecond);
-                    product.setEfficiency(productEfficiency);
-                    this.informationFrameController.updateProductTable(productId, product);
-                    LOGGER.debug("Efficiency of " + productName + ": " + productEfficiency);
-                    if (productEfficiency > bestProductEfficiency) {
-                        bestProductEfficiency = productEfficiency;
-                        idOfMostCostEffectiveProduct = productId;
-                    }
-                }
-            }
-
-            if (idOfMostCostEffectiveProduct != -1) {
-                int productId = idOfMostCostEffectiveProduct;
-                Product productToBuy = this.products.get(productId);
-                String productName = productToBuy.getName();
-                double productPrice = productToBuy.getPrice();
-
-                int percentageComplete = this.calculatePercentageComplete(numberOfCookies, productPrice);
-                this.informationFrameController.setProductLabel(productName);
-                this.informationFrameController.setProductProgressBar(percentageComplete);
-
-                if (productPrice <= numberOfCookies) {
-                    LOGGER.debug("Purchasing product of ID " + productId + ": " + productName);
-                    WebElement productToPurchase = unlockedProducts.get(productId);
-                    LOCK.lock();
-                    try {
-                        this.purchaseProductAndUpdateSpecification(productId, productToPurchase);
-                    } finally {
-                        LOCK.unlock();
-                    }
-                    idOfMostCostEffectiveProduct = -1;
                 }
             }
         }
     }
 
-    private int calculatePercentageComplete(double current, double total) {
-        double percentageComplete = (current / total) * 100;
-        int percentageCompleteInteger = (int) percentageComplete;
-        return percentageCompleteInteger;
-    }
+    private class ProductPurchaser implements Runnable {
+        @Override
+        public void run() {
+            int currentNumberOfUnlockedProducts = 0;
+            int idOfMostCostEffectiveProduct = -1;
 
-    private void addNewProductToCache(int productId, WebElement product) {
-        Product newProduct;
-        newProduct = this.controller.convertProductWebElementToProductObject(productId, product);
-        this.products.put(productId, newProduct);
-    }
+            while (true) {
+                List<WebElement> unlockedProducts = Game.this.controller.getListOfUnlockedProducts();
+                int numberOfUnlockedProducts = unlockedProducts.size();
+                if (numberOfUnlockedProducts > currentNumberOfUnlockedProducts) {
+                    currentNumberOfUnlockedProducts = numberOfUnlockedProducts;
+                    int productId = numberOfUnlockedProducts - 1;
+                    WebElement newProduct = unlockedProducts.get(productId);
+                    LOCK.lock();
+                    try {
+                        this.addNewProductToCache(productId, newProduct);
+                    } finally {
+                        LOCK.unlock();
+                    }
+                    idOfMostCostEffectiveProduct = -1;
+                }
 
-    private double calculateEfficiencyOfProduct(Product product, double cookiesPerSecond) {
-        double productPrice = product.getPrice();
-        double productCookiesPerSecond = product.getCookiesPerSecond();
-        double productEfficiency = productCookiesPerSecond / productPrice;
-        double timeRequiredForProduct = productPrice / cookiesPerSecond;
-        productEfficiency = 0 - (timeRequiredForProduct / productEfficiency);
-        return productEfficiency;
-    }
+                PerformanceData performanceData = Game.this.controller.getPerformanceData();
+                double numberOfCookies = performanceData.getNumberOfCookies();
+                double cookiesPerSecond = performanceData.getCookiesPerSecond();
 
-    private void purchaseProductAndUpdateSpecification(int productId, WebElement product) {
-        this.controller.purchaseUnlockedProduct(productId);
-        Product updatedProduct;
-        updatedProduct = this.controller.convertProductWebElementToProductObject(productId, product);
-        this.products.put(productId, updatedProduct);
+                if (idOfMostCostEffectiveProduct == -1) {
+                    double bestProductEfficiency = BASE_PRODUCT_EFFICIENCY;
+                    for (Map.Entry<Integer, Product> entrySet : Game.this.products.entrySet()) {
+                        Integer productId = entrySet.getKey();
+                        Product product = entrySet.getValue();
+                        String productName = product.getName();
+                        double productEfficiency = this.calculateEfficiencyOfProduct(product, cookiesPerSecond);
+                        product.setEfficiency(productEfficiency);
+                        Game.this.informationFrameController.updateProductTable(productId, product);
+                        LOGGER.debug("Efficiency of " + productName + ": " + productEfficiency);
+                        if (productEfficiency > bestProductEfficiency) {
+                            bestProductEfficiency = productEfficiency;
+                            idOfMostCostEffectiveProduct = productId;
+                        }
+                    }
+                }
+
+                if (idOfMostCostEffectiveProduct != -1) {
+                    int productId = idOfMostCostEffectiveProduct;
+                    Product productToBuy = Game.this.products.get(productId);
+                    String productName = productToBuy.getName();
+                    double productPrice = productToBuy.getPrice();
+
+                    int percentageComplete = this.calculatePercentageComplete(numberOfCookies, productPrice);
+                    Game.this.informationFrameController.setProductLabel(productName);
+                    Game.this.informationFrameController.setProductProgressBar(percentageComplete);
+
+                    if (productPrice <= numberOfCookies) {
+                        LOGGER.debug("Purchasing product of ID " + productId + ": " + productName);
+                        WebElement productToPurchase = unlockedProducts.get(productId);
+                        LOCK.lock();
+                        try {
+                            this.purchaseProductAndUpdateSpecification(productId, productToPurchase);
+                        } finally {
+                            LOCK.unlock();
+                        }
+                        idOfMostCostEffectiveProduct = -1;
+                    }
+                }
+            }
+        }
+
+        private int calculatePercentageComplete(double current, double total) {
+            double percentageComplete = (current / total) * 100;
+            int percentageCompleteInteger = (int) percentageComplete;
+            return percentageCompleteInteger;
+        }
+
+        private void addNewProductToCache(int productId, WebElement product) {
+            Product newProduct;
+            newProduct = Game.this.controller.convertProductWebElementToProductObject(productId, product);
+            Game.this.products.put(productId, newProduct);
+        }
+
+        private double calculateEfficiencyOfProduct(Product product, double cookiesPerSecond) {
+            double productPrice = product.getPrice();
+            double productCookiesPerSecond = product.getCookiesPerSecond();
+            double productEfficiency = productCookiesPerSecond / productPrice;
+            double timeRequiredForProduct = productPrice / cookiesPerSecond;
+            productEfficiency = 0 - (timeRequiredForProduct / productEfficiency);
+            return productEfficiency;
+        }
+
+        private void purchaseProductAndUpdateSpecification(int productId, WebElement product) {
+            Game.this.controller.purchaseUnlockedProduct(productId);
+            Product updatedProduct;
+            updatedProduct = Game.this.controller.convertProductWebElementToProductObject(productId, product);
+            Game.this.products.put(productId, updatedProduct);
+        }
     }
 }

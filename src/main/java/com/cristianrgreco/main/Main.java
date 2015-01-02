@@ -23,6 +23,6 @@ public class Main {
 
     private static void initialiseAndStartGame() {
         Game game = GameFactory.chromeGame(TARGET_URL);
-        new Thread(game).start();
+        game.startGame();
     }
 }
