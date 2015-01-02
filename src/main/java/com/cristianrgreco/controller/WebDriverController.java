@@ -74,7 +74,7 @@ public class WebDriverController {
             return productObject;
         } catch (NumberFormatException | ParseException e) {
             LOGGER.error("Error occurred while getting information for a product", e);
-            System.exit(1);
+            throw new IllegalStateException(e);
         }
         LOGGER.info("Created the following product object for ID of " + productId + ": " + productObject);
         return productObject;

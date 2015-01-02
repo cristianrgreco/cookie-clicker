@@ -113,6 +113,24 @@ public class WebDriverControllerTest {
         assertEquals(expected, actual);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testConvertProductWebElementToProductObjectThrowsExceptionIfNonRecoverableExceptionRaised()
+            throws Exception {
+        double estimatedCookiesPerSecond = 0.025;
+        Product expected = new ProductBuilder().setName("Product").setPrice(5.0)
+                .setCookiesPerSecond(estimatedCookiesPerSecond).build();
+        doReturn("Product").when(this.webDriverAdapter).getNameOfUnlockedProduct(any(Integer.class),
+                any(WebElement.class));
+        doReturn("5.0").when(this.webDriverAdapter).getPriceOfUnlockedProduct(any(Integer.class),
+                any(WebElement.class));
+        doThrow(NumberFormatException.class).when(this.webDriverAdapter).getCookiesPerSecondOfUnlockedProduct(
+                any(Integer.class), any(WebElement.class));
+
+        Product actual = this.target.convertProductWebElementToProductObject(0, null);
+
+        assertEquals(expected, actual);
+    }
+
     @Test
     public void testConvertProductWebElementToProductObjectRetriesIfStaleElementRaised() throws Exception {
         when(this.webDriverAdapter.getNameOfUnlockedProduct(any(Integer.class), any(WebElement.class))).thenThrow(
