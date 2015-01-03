@@ -11,24 +11,25 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WebDriverAdapter {
-    private static final long PAGE_LOAD_TIMEOUT_SECONDS = 30L;
+    private static final long WEB_DRIVER_WAIT_SECONDS = 15L;
     private static final Logger LOGGER = Logger.getLogger(WebDriverAdapter.class);
 
     private WebDriver webDriver;
     private Actions actions;
+    private WebDriverWait webDriverWait;
     private String targetUrl;
 
     public WebDriverAdapter(WebDriver webDriver, String targetUrl) {
         this.webDriver = webDriver;
         this.actions = new Actions(this.webDriver);
+        this.webDriverWait = new WebDriverWait(this.webDriver, WEB_DRIVER_WAIT_SECONDS);
         this.targetUrl = targetUrl;
     }
 
     public void connectToTargetUrl() {
         this.webDriver.get(this.targetUrl);
         LOGGER.debug("Waiting for page elements to load");
-        WebDriverWait webDriverWait = new WebDriverWait(this.webDriver, PAGE_LOAD_TIMEOUT_SECONDS);
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("product0")));
+        this.webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("product0")));
     }
 
     public void clickOnBigCookie() {

@@ -26,7 +26,7 @@ public class Game {
     }
 
     public void startGame() {
-        LOGGER.debug("Starting game with " + NUMBER_OF_CPUS + " threads");
+        LOGGER.debug("Starting new game with up to " + NUMBER_OF_CPUS + " threads");
         this.webDriverController.connectToTargetUrl();
         Executor executor = Executors.newFixedThreadPool(NUMBER_OF_CPUS);
         executor.execute(new BigCookieClicker(LOCK, this.webDriverController, this.informationFrameController));
