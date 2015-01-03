@@ -26,7 +26,7 @@ public class WebDriverFactory {
 
     public static WebDriverController chromeWebDriver(String targetUrl) {
         LOGGER.info("Creating new Chrome web driver for URL: " + targetUrl);
-        String chromeDriverUri = getChromeDriverUri();
+        String chromeDriverUri = System.getProperty(CHROME_DRIVER_PROPERTY_KEY);
         LOGGER.info("Using driver from system property " + CHROME_DRIVER_PROPERTY_KEY + ": " + chromeDriverUri);
         WebDriver webDriver = new ChromeDriver();
         WebDriverController webDriverController = createControllerFromDriver(webDriver, targetUrl);
@@ -40,16 +40,5 @@ public class WebDriverFactory {
         WebDriverController webDriverController = new WebDriverController(webDriverAdapter, numberParser,
                 performanceParser);
         return webDriverController;
-    }
-
-    private static String getChromeDriverUri() {
-        String chromeDriverUri = System.getProperty(CHROME_DRIVER_PROPERTY_KEY);
-        if (chromeDriverUri == null) {
-            LOGGER.error("The system property '" + CHROME_DRIVER_PROPERTY_KEY
-                    + "' must contain the path to a valid chrome driver. "
-                    + "Refer to the README for more information.", new IllegalStateException());
-            System.exit(1);
-        }
-        return chromeDriverUri;
     }
 }
