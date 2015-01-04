@@ -55,7 +55,7 @@ public class WebDriverAdapter {
     public String getCookiesPerSecondOfUnlockedProduct(int productId, WebElement product) {
         this.actions.moveToElement(product).perform();
         WebElement cookiesPerSecondWebElement = this.webDriverWait.until(ExpectedConditions
-                .elementToBeClickable(By.id("tooltip")));
+                .visibilityOfElementLocated(By.id("tooltip")));
         String cookiesPerSecondOfProduct = cookiesPerSecondWebElement.findElement(By.tagName("b")).getText();
         return cookiesPerSecondOfProduct;
     }
