@@ -3,7 +3,6 @@ package com.cristianrgreco.game.action;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebElement;
@@ -17,14 +16,12 @@ public class ProductPurchaser implements Runnable {
     private static final double BASE_PRODUCT_EFFICIENCY = Double.MAX_VALUE * -1;
     private static final Logger LOGGER = Logger.getLogger(ProductPurchaser.class);
 
-    private Lock lock;
     private WebDriverController webDriverController;
     private InformationFrameController informationFrameController;
     private Map<Integer, Product> products;
 
-    public ProductPurchaser(Lock lock, WebDriverController webDriverController,
+    public ProductPurchaser(WebDriverController webDriverController,
             InformationFrameController informationFrameController) {
-        this.lock = lock;
         this.webDriverController = webDriverController;
         this.informationFrameController = informationFrameController;
         this.products = new HashMap<>();
@@ -42,12 +39,7 @@ public class ProductPurchaser implements Runnable {
                 currentNumberOfUnlockedProducts = numberOfUnlockedProducts;
                 int productId = numberOfUnlockedProducts - 1;
                 WebElement newProduct = unlockedProducts.get(productId);
-                this.lock.lock();
-                try {
-                    this.addNewProductToCache(productId, newProduct);
-                } finally {
-                    this.lock.unlock();
-                }
+                this.addNewProductToCache(productId, newProduct);
                 idOfMostCostEffectiveProduct = -1;
             }
 
@@ -85,12 +77,7 @@ public class ProductPurchaser implements Runnable {
                 if (productPrice <= numberOfCookies) {
                     LOGGER.debug("Purchasing product of ID " + productId + ": " + productName);
                     WebElement productToPurchase = unlockedProducts.get(productId);
-                    this.lock.lock();
-                    try {
-                        this.purchaseProductAndUpdateSpecification(productId, productToPurchase);
-                    } finally {
-                        this.lock.unlock();
-                    }
+                    this.purchaseProductAndUpdateSpecification(productId, productToPurchase);
                     idOfMostCostEffectiveProduct = -1;
                 }
             }

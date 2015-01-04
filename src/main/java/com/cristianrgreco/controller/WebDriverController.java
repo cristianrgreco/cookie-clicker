@@ -2,6 +2,8 @@ package com.cristianrgreco.controller;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchElementException;
@@ -16,6 +18,7 @@ import com.cristianrgreco.util.NumberParser;
 import com.cristianrgreco.util.PerformanceParser;
 
 public class WebDriverController {
+    private static final Lock LOCK = new ReentrantLock(true);
     private static final Logger LOGGER = Logger.getLogger(WebDriverController.class);
 
     private WebDriverAdapter webDriverAdapter;
@@ -30,19 +33,35 @@ public class WebDriverController {
     }
 
     public void connectToTargetUrl() {
-        LOGGER.info("Connecting to target URL");
-        this.webDriverAdapter.connectToTargetUrl();
-        LOGGER.info("Connected to target URL");
+        LOCK.lock();
+        try {
+            LOGGER.info("Connecting to target URL");
+            this.webDriverAdapter.connectToTargetUrl();
+            LOGGER.info("Connected to target URL");
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     public void clickOnBigCookie() {
-        LOGGER.debug("Clicking on big cookie");
-        this.webDriverAdapter.clickOnBigCookie();
+        LOCK.lock();
+        try {
+            LOGGER.debug("Clicking on big cookie");
+            this.webDriverAdapter.clickOnBigCookie();
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     public List<WebElement> getListOfUnlockedProducts() {
-        LOGGER.debug("Getting list of unlocked products");
-        List<WebElement> unlockedProducts = this.webDriverAdapter.getListOfUnlockedProducts();
+        List<WebElement> unlockedProducts;
+        LOCK.lock();
+        try {
+            LOGGER.debug("Getting list of unlocked products");
+            unlockedProducts = this.webDriverAdapter.getListOfUnlockedProducts();
+        } finally {
+            LOCK.unlock();
+        }
         int numberOfUnlockedProducts = unlockedProducts.size();
         LOGGER.debug("Found " + numberOfUnlockedProducts + " unlocked products");
         return unlockedProducts;
@@ -50,15 +69,21 @@ public class WebDriverController {
 
     public Product convertProductWebElementToProductObject(int productId, WebElement product) {
         LOGGER.debug("Converting product web element of ID " + productId + " to product object");
-        Product productObject = null;
+        Product productObject;
         String productName = null;
+        String productCookiesPerSecondString;
         double productPrice = -1;
         try {
-            productName = this.webDriverAdapter.getNameOfUnlockedProduct(productId, product);
-            String productPriceString = this.webDriverAdapter.getPriceOfUnlockedProduct(productId, product);
-            productPrice = this.numberParser.parseDoubleWithAppendedText(productPriceString);
-            String productCookiesPerSecondString = this.webDriverAdapter.getCookiesPerSecondOfUnlockedProduct(
-                    productId, product);
+            LOCK.lock();
+            try {
+                productName = this.webDriverAdapter.getNameOfUnlockedProduct(productId, product);
+                String productPriceString = this.webDriverAdapter.getPriceOfUnlockedProduct(productId, product);
+                productPrice = this.numberParser.parseDoubleWithAppendedText(productPriceString);
+                productCookiesPerSecondString = this.webDriverAdapter.getCookiesPerSecondOfUnlockedProduct(
+                        productId, product);
+            } finally {
+                LOCK.unlock();
+            }
             double productCookiesPerSecond = this.numberParser
                     .parseDoubleWithAppendedText(productCookiesPerSecondString);
             productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
@@ -87,13 +112,24 @@ public class WebDriverController {
     }
 
     public void purchaseUnlockedProduct(int productId) {
-        LOGGER.info("Purchasing product of ID " + productId);
-        this.webDriverAdapter.purchaseUnlockedProduct(productId);
+        LOCK.lock();
+        try {
+            LOGGER.info("Purchasing product of ID " + productId);
+            this.webDriverAdapter.purchaseUnlockedProduct(productId);
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     public PerformanceData getPerformanceData() {
-        LOGGER.debug("Getting performance data");
-        String performanceString = this.webDriverAdapter.getPerformanceString();
+        String performanceString;
+        LOCK.lock();
+        try {
+            LOGGER.debug("Getting performance data");
+            performanceString = this.webDriverAdapter.getPerformanceString();
+        } finally {
+            LOCK.unlock();
+        }
         PerformanceData performanceData = this.performanceParser.parsePerformanceData(performanceString);
         return performanceData;
     }
