@@ -14,4 +14,4 @@ java -Dchrome.webdriver.driver=/Users/user/Downloads/chromedriver -jar cookie-cl
 ```
 
 More information about the Chrome driver can be found here:
-[Chrome Driver Wiki](https://code.google.com/p/selenium/wiki/ChromeDriver)
+[Chrome Driver Wiki](https://code.google.com/p/selenium/wiki/ChromeDriver).
