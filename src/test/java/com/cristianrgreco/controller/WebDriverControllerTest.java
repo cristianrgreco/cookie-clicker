@@ -91,7 +91,7 @@ public class WebDriverControllerTest {
         doReturn(5.0).when(this.numberParser).parseDoubleWithAppendedText("5.0");
         doReturn(0.5).when(this.numberParser).parseDoubleWithAppendedText("0.5");
 
-        Product actual = this.target.convertProductWebElementToProductObject(0, null);
+        Product actual = this.target.createProductObjectFromWebPage(0, null);
 
         assertEquals(expected, actual);
     }
@@ -108,7 +108,7 @@ public class WebDriverControllerTest {
         doThrow(NoSuchElementException.class).when(this.webDriverAdapter).getCookiesPerSecondOfUnlockedProduct(
                 any(Integer.class), any(WebElement.class));
 
-        Product actual = this.target.convertProductWebElementToProductObject(0, null);
+        Product actual = this.target.createProductObjectFromEstimate(0, null);
 
         assertEquals(expected, actual);
     }
@@ -126,7 +126,7 @@ public class WebDriverControllerTest {
         doThrow(NumberFormatException.class).when(this.webDriverAdapter).getCookiesPerSecondOfUnlockedProduct(
                 any(Integer.class), any(WebElement.class));
 
-        Product actual = this.target.convertProductWebElementToProductObject(0, null);
+        Product actual = this.target.createProductObjectFromWebPage(0, null);
 
         assertEquals(expected, actual);
     }
@@ -142,7 +142,7 @@ public class WebDriverControllerTest {
         doReturn(5.0).when(this.numberParser).parseDoubleWithAppendedText("5.0");
         doReturn(0.5).when(this.numberParser).parseDoubleWithAppendedText("0.5");
 
-        this.target.convertProductWebElementToProductObject(0, null);
+        this.target.createProductObjectFromWebPage(0, null);
 
         verify(this.webDriverAdapter, times(2)).getNameOfUnlockedProduct(0, null);
     }

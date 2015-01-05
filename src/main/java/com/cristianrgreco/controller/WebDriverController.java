@@ -6,7 +6,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
@@ -67,8 +66,44 @@ public class WebDriverController {
         return unlockedProducts;
     }
 
-    public Product convertProductWebElementToProductObject(int productId, WebElement product) {
-        LOGGER.debug("Converting product web element of ID " + productId + " to product object");
+    public Product createProductObjectFromEstimate(int productId, WebElement product) {
+        LOGGER.debug("Converting product web element of ID " + productId + " to object from estimate");
+        Product productObject;
+        String productName = null;
+        double estimatedCookiesPerSecond;
+        double productPrice = -1;
+        try {
+            LOCK.lock();
+            try {
+                productName = this.webDriverAdapter.getNameOfUnlockedProduct(productId, product);
+                String productPriceString = this.webDriverAdapter.getPriceOfUnlockedProduct(productId, product);
+                productPrice = this.numberParser.parseDoubleWithAppendedText(productPriceString);
+                estimatedCookiesPerSecond = this.estimateProductCookiesPerSecondFromPrice(productPrice);
+            } finally {
+                LOCK.unlock();
+            }
+            productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
+                    .setCookiesPerSecond(estimatedCookiesPerSecond).build();
+        } catch (StaleElementReferenceException e) {
+            LOGGER.debug("Encountered a StaleElementException, retrying");
+            productObject = this.createProductObjectFromEstimate(productId, product);
+            return productObject;
+        } catch (NumberFormatException | ParseException e) {
+            LOGGER.error("Error occurred while getting information for a product", e);
+            throw new IllegalStateException(e);
+        }
+        LOGGER.info("Created the following product for ID of " + productId + ": " + productObject);
+        return productObject;
+    }
+
+    private double estimateProductCookiesPerSecondFromPrice(double productPrice) {
+        double estimatedCookiesPerSecond = productPrice / 100;
+        estimatedCookiesPerSecond -= ((estimatedCookiesPerSecond / 10) * 5);
+        return estimatedCookiesPerSecond;
+    }
+
+    public Product createProductObjectFromWebPage(int productId, WebElement product) {
+        LOGGER.debug("Converting product web element of ID " + productId + " to object from web page");
         Product productObject;
         String productName = null;
         String productCookiesPerSecondString;
@@ -88,27 +123,16 @@ public class WebDriverController {
                     .parseDoubleWithAppendedText(productCookiesPerSecondString);
             productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
                     .setCookiesPerSecond(productCookiesPerSecond).build();
-        } catch (NoSuchElementException e) {
-            LOGGER.debug("New product found, estimating product specification");
-            double estimatedCookiesPerSecond = this.estimateProductCookiesPerSecondFromPrice(productPrice);
-            productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
-                    .setCookiesPerSecond(estimatedCookiesPerSecond).build();
         } catch (StaleElementReferenceException e) {
             LOGGER.debug("Encountered a StaleElementException, retrying");
-            productObject = this.convertProductWebElementToProductObject(productId, product);
+            productObject = this.createProductObjectFromWebPage(productId, product);
             return productObject;
         } catch (NumberFormatException | ParseException e) {
             LOGGER.error("Error occurred while getting information for a product", e);
             throw new IllegalStateException(e);
         }
-        LOGGER.info("Created the following product object for ID of " + productId + ": " + productObject);
+        LOGGER.info("Created the following product for ID of " + productId + ": " + productObject);
         return productObject;
-    }
-
-    private double estimateProductCookiesPerSecondFromPrice(double productPrice) {
-        double estimatedCookiesPerSecond = productPrice / 100;
-        estimatedCookiesPerSecond -= ((estimatedCookiesPerSecond / 10) * 5);
-        return estimatedCookiesPerSecond;
     }
 
     public void purchaseUnlockedProduct(int productId) {

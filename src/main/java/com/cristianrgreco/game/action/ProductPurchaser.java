@@ -1,8 +1,10 @@
 package com.cristianrgreco.game.action;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebElement;
@@ -19,12 +21,14 @@ public class ProductPurchaser implements Runnable {
     private WebDriverController webDriverController;
     private InformationFrameController informationFrameController;
     private Map<Integer, Product> products;
+    private Set<Integer> purchaseReceipts;
 
     public ProductPurchaser(WebDriverController webDriverController,
             InformationFrameController informationFrameController) {
         this.webDriverController = webDriverController;
         this.informationFrameController = informationFrameController;
         this.products = new HashMap<>();
+        this.purchaseReceipts = new HashSet<>();
     }
 
     @Override
@@ -91,7 +95,12 @@ public class ProductPurchaser implements Runnable {
     }
 
     private void addNewProductToCache(int productId, WebElement product) {
-        Product newProduct = this.webDriverController.convertProductWebElementToProductObject(productId, product);
+        Product newProduct;
+        if (this.purchaseReceipts.contains(productId)) {
+            newProduct = this.webDriverController.createProductObjectFromWebPage(productId, product);
+        } else {
+            newProduct = this.webDriverController.createProductObjectFromEstimate(productId, product);
+        }
         this.products.put(productId, newProduct);
     }
 
@@ -107,7 +116,8 @@ public class ProductPurchaser implements Runnable {
     private void purchaseProductAndUpdateSpecification(int productId, WebElement product) {
         this.webDriverController.purchaseUnlockedProduct(productId);
         Product updatedProduct;
-        updatedProduct = this.webDriverController.convertProductWebElementToProductObject(productId, product);
+        updatedProduct = this.webDriverController.createProductObjectFromWebPage(productId, product);
         this.products.put(productId, updatedProduct);
+        this.purchaseReceipts.add(productId);
     }
 }
