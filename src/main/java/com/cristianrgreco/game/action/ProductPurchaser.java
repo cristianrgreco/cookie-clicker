@@ -91,8 +91,7 @@ public class ProductPurchaser implements Runnable {
     }
 
     private void addNewProductToCache(int productId, WebElement product) {
-        Product newProduct;
-        newProduct = this.webDriverController.convertProductWebElementToProductObject(productId, product);
+        Product newProduct = this.webDriverController.convertProductWebElementToProductObject(productId, product);
         this.products.put(productId, newProduct);
     }
 
