@@ -108,8 +108,6 @@ public class ProductPurchaser implements Runnable {
         double productPrice = product.getPrice();
         double productCookiesPerSecond = product.getCookiesPerSecond();
         double productEfficiency = productCookiesPerSecond / productPrice;
-        double timeRequiredForProduct = productPrice / cookiesPerSecond;
-        productEfficiency = 0 - (timeRequiredForProduct / productEfficiency);
         return productEfficiency;
     }
 

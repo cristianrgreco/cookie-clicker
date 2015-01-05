@@ -36,13 +36,13 @@ public class InformationFrameController {
             productTableModel.setValueAt(product.getName(), productId, 0);
             productTableModel.setValueAt(product.getPrice(), productId, 1);
             productTableModel.setValueAt(product.getCookiesPerSecond(), productId, 2);
-            productTableModel.setValueAt((int) product.getEfficiency(), productId, 3);
+            productTableModel.setValueAt(product.getEfficiency(), productId, 3);
         }
     }
 
     private void addNewProductToTable(Product product) {
         DefaultTableModel productTableModel = this.informationFrame.getProductTableModel();
         productTableModel.addRow(new Object[] { product.getName(), product.getPrice(),
-                product.getCookiesPerSecond(), (int) product.getEfficiency() });
+                product.getCookiesPerSecond(), product.getEfficiency() });
     }
 }

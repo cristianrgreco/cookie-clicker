@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.cristianrgreco.controller.InformationFrameController;
 import com.cristianrgreco.model.builder.ProductBuilder;
 import com.cristianrgreco.model.entity.Product;
 import com.cristianrgreco.ui.InformationFrame;
@@ -61,7 +60,7 @@ public class InformationFrameControllerTest {
         String expectedName = "Product 1";
         double expectedPrice = 5.0;
         double expectedCookiesPerSecond = 0.5;
-        int expectedEfficiency = -5;
+        double expectedEfficiency = -5;
         int productId = 0;
         Product product = new ProductBuilder().setName(expectedName).setPrice(expectedPrice)
                 .setCookiesPerSecond(expectedCookiesPerSecond).setEfficiency(expectedEfficiency).build();
@@ -71,12 +70,12 @@ public class InformationFrameControllerTest {
         double actualPrice = (double) this.informationFrame.getProductTableModel().getValueAt(productId, 1);
         double actualCookiesPerSecond = (double) this.informationFrame.getProductTableModel().getValueAt(
                 productId, 2);
-        int actualEfficiency = (int) this.informationFrame.getProductTableModel().getValueAt(productId, 3);
+        double actualEfficiency = (double) this.informationFrame.getProductTableModel().getValueAt(productId, 3);
 
         assertEquals(expectedName, actualName);
         assertEquals(expectedPrice, actualPrice, 0);
         assertEquals(expectedCookiesPerSecond, actualCookiesPerSecond, 0);
-        assertEquals(expectedEfficiency, actualEfficiency);
+        assertEquals(expectedEfficiency, actualEfficiency, 0);
     }
 
     @Test
