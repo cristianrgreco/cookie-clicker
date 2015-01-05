@@ -47,17 +47,13 @@ public class ProductPurchaser implements Runnable {
                 idOfMostCostEffectiveProduct = -1;
             }
 
-            PerformanceData performanceData = this.webDriverController.getPerformanceData();
-            double numberOfCookies = performanceData.getNumberOfCookies();
-            double cookiesPerSecond = performanceData.getCookiesPerSecond();
-
             if (idOfMostCostEffectiveProduct == -1) {
                 double bestProductEfficiency = BASE_PRODUCT_EFFICIENCY;
                 for (Map.Entry<Integer, Product> entrySet : this.products.entrySet()) {
                     Integer productId = entrySet.getKey();
                     Product product = entrySet.getValue();
                     String productName = product.getName();
-                    double productEfficiency = this.calculateEfficiencyOfProduct(product, cookiesPerSecond);
+                    double productEfficiency = this.calculateEfficiencyOfProduct(product);
                     product.setEfficiency(productEfficiency);
                     this.informationFrameController.updateProductTable(productId, product);
                     LOGGER.debug("Efficiency of " + productName + ": " + productEfficiency);
@@ -73,6 +69,9 @@ public class ProductPurchaser implements Runnable {
                 Product productToBuy = this.products.get(productId);
                 String productName = productToBuy.getName();
                 double productPrice = productToBuy.getPrice();
+
+                PerformanceData performanceData = this.webDriverController.getPerformanceData();
+                double numberOfCookies = performanceData.getNumberOfCookies();
 
                 int percentageComplete = this.calculatePercentageComplete(numberOfCookies, productPrice);
                 this.informationFrameController.setProductLabel(productName);
@@ -104,7 +103,7 @@ public class ProductPurchaser implements Runnable {
         this.products.put(productId, newProduct);
     }
 
-    private double calculateEfficiencyOfProduct(Product product, double cookiesPerSecond) {
+    private double calculateEfficiencyOfProduct(Product product) {
         double productPrice = product.getPrice();
         double productCookiesPerSecond = product.getCookiesPerSecond();
         double productEfficiency = productCookiesPerSecond / productPrice;
