@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
@@ -123,6 +124,11 @@ public class WebDriverController {
                     .parseDoubleWithAppendedText(productCookiesPerSecondString);
             productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
                     .setCookiesPerSecond(productCookiesPerSecond).build();
+        } catch (NoSuchElementException e) {
+            LOGGER.debug("Product does not expose CPS, creating estimate");
+            double estimatedCookiesPerSecond = this.estimateProductCookiesPerSecondFromPrice(productPrice);
+            productObject = new ProductBuilder().setName(productName).setPrice(productPrice)
+                    .setCookiesPerSecond(estimatedCookiesPerSecond).build();
         } catch (StaleElementReferenceException e) {
             LOGGER.debug("Encountered a StaleElementException, retrying");
             productObject = this.createProductObjectFromWebPage(productId, product);
