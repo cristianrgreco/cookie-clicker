@@ -77,7 +77,10 @@ public class WebDriverAdapter {
                 this.tooltip = this.webDriver.findElement(By.id("tooltip"));
             }
             this.actions.moveToElement(product).perform();
-            this.webDriverWait.until(ExpectedConditions.visibilityOf(this.tooltip));
+            boolean isTooltipVisible = false;
+            while (!isTooltipVisible) {
+                isTooltipVisible = this.tooltip.getText().length() > 0;
+            }
             cookiesPerSecond = this.tooltip.findElement(By.tagName("b")).getText();
             this.unlockedProductCookiesPerSecond.put(productId, cookiesPerSecond);
         }
