@@ -98,8 +98,7 @@ public class WebDriverController {
     }
 
     private double estimateProductCookiesPerSecondFromPrice(double productPrice) {
-        double estimatedCookiesPerSecond = productPrice / 100;
-        estimatedCookiesPerSecond -= ((estimatedCookiesPerSecond / 10) * 5);
+        double estimatedCookiesPerSecond = (productPrice / 100) * 0.4;
         return estimatedCookiesPerSecond;
     }
 

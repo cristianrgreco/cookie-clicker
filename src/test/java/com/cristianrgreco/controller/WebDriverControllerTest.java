@@ -98,9 +98,8 @@ public class WebDriverControllerTest {
 
     @Test
     public void testConvertProductWebElementToProductObjectEstimatesSpecIfNoProductInfoExists() throws Exception {
-        double estimatedCookiesPerSecond = 0.025;
         Product expected = new ProductBuilder().setName("Product").setPrice(5.0)
-                .setCookiesPerSecond(estimatedCookiesPerSecond).build();
+                .setCookiesPerSecond(0.020000000000000004).build();
         doReturn("Product").when(this.webDriverAdapter).getNameOfUnlockedProduct(any(Integer.class),
                 any(WebElement.class));
         doReturn("5.0").when(this.webDriverAdapter).getPriceOfUnlockedProduct(any(Integer.class),
