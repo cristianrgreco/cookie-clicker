@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,6 +23,7 @@ public class WebDriverAdapter {
     private String targetUrl;
 
     private WebElement bigCookie;
+    private Action bigCookieAction;
     private WebElement cookies;
     private WebElement tooltip;
     private Map<Integer, WebElement> unlockedProducts;
@@ -47,8 +49,13 @@ public class WebDriverAdapter {
     public void clickOnBigCookie() {
         if (this.bigCookie == null) {
             this.bigCookie = this.webDriver.findElement(By.id("bigCookie"));
+            Actions bigCookieActions = new Actions(this.webDriver).moveToElement(this.bigCookie);
+            for (int i = 0; i < 50; i++) {
+                bigCookieActions = bigCookieActions.click();
+            }
+            this.bigCookieAction = bigCookieActions.build();
         }
-        this.bigCookie.click();
+        this.bigCookieAction.perform();
     }
 
     public List<WebElement> getListOfUnlockedProducts() {
